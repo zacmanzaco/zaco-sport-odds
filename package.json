@@ -1,0 +1,39 @@
+{
+  "name": "zaco-sport-odds",
+  "version": "1.0.0",
+  "description": "Site de pronostics football : statistiques réelles, matchs en direct, consensus de 4 modèles (Elo, Dixon-Coles, forme, marché), calendrier, classements et gestion de bankroll.",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "vendor": "node -e \"require('fs').copyFileSync('node_modules/chart.js/dist/chart.umd.js','public/vendor/chart.umd.js')\"",
+    "test": "node tests/smoke.mjs && node tests/charts.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zacmanzaco/zaco-sport-odds.git"
+  },
+  "keywords": [
+    "football",
+    "pronostics",
+    "paris-sportifs",
+    "bankroll",
+    "statistiques",
+    "elo",
+    "dixon-coles",
+    "chartjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zacmanzaco/zaco-sport-odds/issues"
+  },
+  "homepage": "https://github.com/zacmanzaco/zaco-sport-odds#readme",
+  "dependencies": {
+    "chart.js": "^4.4.7"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.1"
+  }
+}
