@@ -74,8 +74,71 @@
     'lexington sc': 'lexington', 'lexington': 'lexington',
     'new mexico united': 'new mexico', 'sacramento republic': 'sacramento',
     'oakland roots': 'oakland roots', 'phoenix rising': 'phoenix rising',
-    'spain': 'spain', 'espagne': 'spain', 'argentina': 'argentina', 'argentine': 'argentina'
+    'spain': 'spain', 'espagne': 'spain', 'argentina': 'argentina', 'argentine': 'argentina',
+
+    /* --- Premier League (noms officiels TheSportsDB) --- */
+    'afc bournemouth': 'bournemouth', 'brighton hove albion': 'brighton',
+    'chelsea': 'chelsea', 'everton': 'everton', 'burnley': 'burnley',
+    'newcastle united': 'newcastle', 'newcastle': 'newcastle',
+    'nottingham forest': 'nottm forest', 'nottm forest': 'nottm forest',
+    'tottenham hotspur': 'tottenham', 'tottenham': 'tottenham', 'spurs': 'tottenham',
+    'west ham united': 'west ham', 'west ham': 'west ham',
+    'wolverhampton wanderers': 'wolves', 'wolverhampton': 'wolves', 'wolves': 'wolves',
+    'crystal palace': 'crystal palace',
+
+    /* --- LaLiga --- */
+    'celta vigo': 'celta vigo', 'rc celta': 'celta vigo', 'getafe cf': 'getafe', 'getafe': 'getafe',
+    'rayo vallecano': 'rayo', 'rayo': 'rayo', 'athletic club': 'athletic bilbao',
+    'athletic bilbao': 'athletic bilbao', 'sevilla fc': 'sevilla', 'sevilla': 'sevilla',
+    'deportivo alaves': 'alaves', 'alaves': 'alaves', 'elche cf': 'elche', 'elche': 'elche',
+    'levante ud': 'levante', 'levante': 'levante', 'ca osasuna': 'osasuna', 'osasuna': 'osasuna',
+    'rcd mallorca': 'mallorca', 'mallorca': 'mallorca', 'girona fc': 'girona', 'girona': 'girona',
+    'real oviedo': 'real oviedo',
+
+    /* --- Serie A --- */
+    'inter milan': 'inter', 'inter': 'inter', 'internazionale': 'inter',
+    'as roma': 'roma', 'roma': 'roma', 'ssc napoli': 'napoli', 'napoli': 'napoli',
+    'atalanta bc': 'atalanta', 'atalanta': 'atalanta', 'bologna fc': 'bologna', 'bologna': 'bologna',
+    'ss lazio': 'lazio', 'lazio': 'lazio', 'udinese calcio': 'udinese', 'udinese': 'udinese',
+    'us sassuolo': 'sassuolo', 'sassuolo': 'sassuolo', 'torino fc': 'torino', 'torino': 'torino',
+    'parma calcio': 'parma', 'parma': 'parma', 'cagliari calcio': 'cagliari', 'cagliari': 'cagliari',
+    'us cremonese': 'cremonese', 'cremonese': 'cremonese', 'hellas verona': 'verona', 'verona': 'verona',
+    'pisa sc': 'pisa', 'pisa': 'pisa', 'acf fiorentina': 'fiorentina',
+
+    /* --- Ligue 1 --- */
+    'stade rennais': 'rennes', 'stade rennais fc': 'rennes', 'rennes': 'rennes',
+    'as monaco': 'monaco', 'monaco': 'monaco',
+    'rc strasbourg': 'strasbourg', 'rc strasbourg alsace': 'strasbourg', 'strasbourg': 'strasbourg',
+    'toulouse fc': 'toulouse', 'toulouse': 'toulouse', 'fc lorient': 'lorient', 'lorient': 'lorient',
+    'paris fc': 'paris fc', 'stade brestois': 'brest', 'stade brestois 29': 'brest', 'brest': 'brest',
+    'angers sco': 'angers', 'angers': 'angers', 'le havre ac': 'le havre', 'le havre': 'le havre',
+    'aj auxerre': 'auxerre', 'auxerre': 'auxerre', 'ogc nice': 'nice', 'nice': 'nice',
+    'fc nantes': 'nantes', 'nantes': 'nantes', 'fc metz': 'metz', 'metz': 'metz',
+
+    /* --- 2. Bundesliga (OpenLigaDB) --- */
+    'hertha bsc': 'hertha', 'hertha': 'hertha',
+    'nurnberg': 'nuernberg', '1 fc nurnberg': 'nuernberg',
+    'kaiserslautern': 'kaiserslautern', '1 fc kaiserslautern': 'kaiserslautern',
+    'magdeburg': 'magdeburg', '1 fc magdeburg': 'magdeburg',
+    'cottbus': 'cottbus', 'energie cottbus': 'cottbus', 'fc energie cottbus': 'cottbus',
+    'bochum': 'bochum', 'vfl bochum': 'bochum',
+    'hannover 96': 'hannover', 'hannover': 'hannover',
+    'osnabruck': 'osnabrueck', 'vfl osnabruck': 'osnabrueck',
+    'greuther furth': 'fuerth', 'spvgg greuther furth': 'fuerth', 'furth': 'fuerth',
+    'arminia bielefeld': 'bielefeld', 'dsc arminia bielefeld': 'bielefeld', 'bielefeld': 'bielefeld',
+    'karlsruhe': 'karlsruhe', 'karlsruher sc': 'karlsruhe',
+    'braunschweig': 'braunschweig', 'eintracht braunschweig': 'braunschweig',
+    'kiel': 'kiel', 'holstein kiel': 'kiel',
+    'dresden': 'dresden', 'dynamo dresden': 'dresden',
+    'darmstadt': 'darmstadt', 'sv darmstadt 98': 'darmstadt', 'darmstadt 98': 'darmstadt'
   };
+
+  /* Les identifiants internes sont eux-mêmes des clés valides : une API qui
+   * renvoie « Crystal Palace » ou « Inter » tombe donc directement juste. */
+  Object.keys(ALIASES).forEach(function (k) {
+    var v = ALIASES[k];
+    if (!ALIASES[v]) ALIASES[v] = v;
+  });
 
   function teamKey(name) {
     var n = norm(name);

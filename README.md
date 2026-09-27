@@ -12,8 +12,8 @@ reconnues par la communauté des parieurs professionnels.
 
 | # | Demande | Réalisation |
 |---|---------|-------------|
-| 1 | **Statistiques complètes en direct** | Classements, buts marqués/encaissés, moyennes de buts par championnat, forme (5 derniers matchs), buteurs, affluences — synchronisés depuis OpenLigaDB et TheSportsDB |
-| 2 | **Regroupement de tous les matchs / championnats / Coupe du monde** | 9 compétitions : Bundesliga, Premier League, LaLiga, Serie A, Ligue 1, Ligue des Champions, MLS, USL Championship, Coupe du Monde FIFA 2026 |
+| 1 | **Statistiques complètes en direct** | **8 classements réels dont 6 complets** (18 à 20 équipes), buts marqués/encaissés, moyennes de buts par championnat, forme, buteurs avec minute, affluences — synchronisés depuis OpenLigaDB, TheSportsDB et l'API Wikipédia |
+| 2 | **Regroupement de tous les matchs / championnats / Coupe du monde** | **10 compétitions** : Bundesliga, **2. Bundesliga**, Premier League, LaLiga, Serie A, Ligue 1, Ligue des Champions, MLS, USL Championship, Coupe du Monde FIFA 2026 |
 | 3 | **Architecture moderne et attirante** | Design system CSS maison, palette « pelouse » (émeraude / citron / or / cramoisi), animations fluides, 100 % responsive (mobile → 4K) |
 | 4 | **Affichage des matchs en direct** | Statuts `LIVE / MI-TEMPS / À venir / Terminé`, minute de jeu calculée, polling automatique configurable (45 s par défaut) |
 | 5 | **Pronostics basés sur les meilleurs pronostiqueurs** | Consensus de 4 modèles : **Elo**, **Poisson bivarié Dixon-Coles**, **forme/momentum**, **probabilités implicites du marché** |
@@ -31,14 +31,24 @@ Aucune donnée n'est inventée. Le fichier `public/js/data/snapshot.js` est un
 
 | Source | URL | Contenu utilisé |
 |--------|-----|-----------------|
-| **OpenLigaDB** | `https://api.openligadb.de` | Bundesliga 1 : classement complet 18 équipes (saison en cours + saison 2025/26), journées 4 à 7, buteurs avec minute, scores |
+| **OpenLigaDB** | `https://api.openligadb.de` | Bundesliga 1 & **2. Bundesliga** : classements **complets** (18 équipes), journées 4 à 7, résultats, buteurs avec minute |
 | **TheSportsDB** | `https://www.thesportsdb.com/api/v1/json/3/` | Premier League, LaLiga, Serie A, Ligue 1, UEFA Champions League, MLS, USL Championship, Coupe du Monde — classements, matchs joués et à venir |
-| **Wikipédia** | `https://en.wikipedia.org` | Vérification des clubs et stades du championnat d'Angleterre |
+| **Wikipédia** (API `action=parse`) | `https://en.wikipedia.org/w/api.php` | **Classements finaux complets 2025/2026** des quatre grands championnats (20/20/20/18 équipes), recoupés ligne par ligne avec TheSportsDB |
+
+> L'API `action=parse` de Wikipédia est le contournement utilisé pour la limite de
+> 5 lignes de TheSportsDB : elle renvoie le tableau de classement **entier et dans
+> l'ordre officiel**, ce qui permet d'obtenir les 20 équipes de Premier League, de
+> LaLiga et de Serie A et les 18 de Ligue 1 (positions, points, différence de buts).
 
 ### Exemples de données réelles embarquées
 
+* **Premier League 2025/2026 (finale, 20 équipes)** — Arsenal champion 85 pts (26-7-5, 71-27) devant Manchester City 78 et Manchester United 71 ; West Ham, Burnley et Wolverhampton relégués.
+* **LaLiga 2025/2026 (finale, 20 équipes)** — Barcelona 94 pts (95 buts marqués), Real Madrid 86, Villarreal 72, Atlético 69 ; Mallorca, Girona et Real Oviedo relégués.
+* **Serie A 2025/2026 (finale, 20 équipes)** — Inter 87 pts, Napoli 76, Roma 73, Como 71, AC Milan 70 ; Cremonese, Hellas Verona et Pisa relégués.
+* **Ligue 1 2025/2026 (finale, 18 équipes)** — PSG champion 76 pts, Lens 70, Lille 61, Lyon 60, Marseille 59 ; Nantes et Metz relégués.
 * **Bundesliga 2025/2026 (classement final complet)** — Bayern 89 pts (122 buts marqués), Dortmund 73, Leipzig 65, Stuttgart 62, Hoffenheim 61…
 * **Bundesliga 2026/2027 (après 4 journées)** — Dortmund 12 pts devant Bayern 10 et Freiburg 10 ; Union Berlin 17e, Gladbach 18e.
+* **2. Bundesliga 2026/2027 (après 6 journées)** — Hertha BSC 18 pts (6 victoires en 6 matchs), Nürnberg 16, Heidenheim 13 ; 9 résultats réels (Wolfsburg 5-1 Darmstadt, Dresden 1-2 Hertha…) et les 9 affiches de la 7ᵉ journée.
 * **Bayern Munich 7 – 0 Union Berlin** (18/09/2026) — buts de Musiala 18', Kane 39' (pen.) et 54', Olise 43', 73', 76', Saibari 70'.
 * **Gladbach 3 – 4 Mainz** (19/09/2026) — 7 buts, dont un penalty de Machino à la 95'.
 * **AC Milan 3 – 0 Lecce**, **Valence 2 – 3 Real Sociedad**, **Como 4 – 1 RB Leipzig**, **Fulham 1 – 1 Manchester United**.
@@ -102,12 +112,13 @@ zaco-sport-odds/
 │   └── js/
 │       ├── data/snapshot.js    Jeu de données RÉELLES embarqué
 │       ├── model.js            Moteur de pronostics (Elo + Dixon-Coles + forme + marché)
-│       ├── api.js              Couche réseau temps réel (OpenLigaDB, TheSportsDB, proxy)
+│       ├── api.js              Couche réseau temps réel (OpenLigaDB bl1/bl2, TheSportsDB, proxy)
 │       ├── bankroll.js         Gestion de bankroll et statistiques (localStorage)
 │       ├── charts.js           Graphiques Chart.js (7 visualisations)
 │       ├── ui.js               Templates et helpers de rendu
 │       └── app.js              Orchestration, filtres, modales, navigation
 └── tests/
+    ├── data.mjs                Intégrité du jeu de données et du moteur (arithmétique des classements, alias, pronostics)
     ├── smoke.mjs               Test d'intégration DOM complet (jsdom)
     └── charts.mjs              Validation des configurations Chart.js
 ```
@@ -127,7 +138,7 @@ environnement de prévisualisation).
 ### Tests
 
 ```bash
-npm test             # 35 assertions : rendu DOM, filtres, modales, bankroll, graphiques
+npm test             # 3 suites : intégrité des données, rendu DOM, graphiques
 ```
 
 ### Repli proxy
@@ -147,6 +158,8 @@ Le proxy n'accepte qu'une **liste blanche d'hôtes** (`api.openligadb.de`,
 L'application **fonctionne intégralement sans Internet** grâce au snapshot réel
 embarqué : toutes les sections, le moteur de pronostics et la bankroll restent
 opérationnels. Le bandeau d'en-tête indique alors « 📦 Snapshot embarqué ».
+Le direct peut aussi être **désactivé manuellement** dans *Sources → Réglages* :
+aucune requête réseau n'est alors émise, seules les données embarquées sont utilisées.
 
 ---
 
@@ -155,8 +168,10 @@ opérationnels. Le bandeau d'en-tête indique alors « 📦 Snapshot embarqué �
 * **Cotes des bookmakers** : non incluses (les API d'odds gratuites exigent une clé).
   Le site affiche la **cote juste** issue du modèle ; si l'utilisateur saisit la cote
   de son bookmaker, la **value** et la mise **demi-Kelly** sont calculées.
-* **Classements tronqués à 5 équipes** pour les championnats non couverts par
-  OpenLigaDB (limite de la clé gratuite TheSportsDB) — signalé dans l'interface.
+* **Classements tronqués à 5 équipes** uniquement pour la **saison en cours des
+  championnats étrangers** (limite de la clé gratuite TheSportsDB) — signalé dans
+  l'interface par la mention « partiel ». Les classements **finaux** de ces mêmes
+  championnats sont, eux, complets (20/20/20/18 équipes) via l'API Wikipédia.
 * **Validation du modèle** : l'échantillon de matchs terminés est volontairement
   petit et la taille est affichée. Les forces sont recalculées sur la saison
   précédente pour éviter tout biais de connaissance anticipée.

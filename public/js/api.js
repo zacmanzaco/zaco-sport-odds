@@ -40,6 +40,13 @@
     { comp: 'bl1',     id: '4331', season: '2026-2027' }
   ];
 
+  /* Identifiants des compétitions côté OpenLigaDB (classements COMPLETS,
+   * sans la limite de 5 lignes imposée par l'API gratuite de TheSportsDB). */
+  var OPENLIGA_LEAGUES = [
+    { comp: 'bl1', label: 'Bundesliga',    name: 'Bundesliga',    season: 2026, seasonLabel: '2026/2027' },
+    { comp: 'bl2', label: '2. Bundesliga', name: '2. Bundesliga', season: 2026, seasonLabel: '2026/2027' }
+  ];
+
   var STATUS = { mode: 'snapshot', sources: [], lastSync: null, errors: [] };
 
   /* ------------------------------ Réglages ------------------------------ */
@@ -128,7 +135,8 @@
   function compFromTsdbLeague(id) { return TSDB_ID_TO_COMP[String(id)] || 'other-' + id; }
 
   /** OpenLigaDB : un match brut → format normalisé. */
-  function openLigaMatch(m) {
+  function openLigaMatch(m, comp) {
+    comp = comp || 'bl1';
     var end = null, ht = null;
     (m.matchResults || []).forEach(function (r) {
       if (r.resultTypeID === 2) end = r;
@@ -151,7 +159,7 @@
 
     return {
       id: 'ol-' + m.matchID,
-      comp: 'bl1',
+      comp: comp,
       round: (m.group && m.group.groupName) || 'Saison',
       ts: m.matchDateTimeUTC || m.matchDateTime,
       status: status,
@@ -211,20 +219,31 @@
    */
   function sync() {
     var s = settings();
+    if (!s.live) {
+      // L'utilisateur a désactivé le direct : on reste sur le snapshot embarqué.
+      STATUS.mode = 'snapshot';
+      STATUS.errors = [];
+      STATUS.sources = [{ name: 'Snapshot embarqué (direct désactivé)', ok: true, count: 0 }];
+      STATUS.lastSync = new Date().toISOString();
+      return Promise.resolve({ matches: [], tables: [], status: STATUS });
+    }
     var jobs = [];
     var srcResults = [];
 
-    // --- 1. OpenLigaDB : Bundesliga complète (calendrier + classement)
-    jobs.push(settle(getJson(CFG.openliga + '/getmatchdata/bl1')).then(function (r) {
-      srcResults.push({ name: 'OpenLigaDB · matchs', ok: r.ok, count: r.ok ? r.value.length : 0, error: r.error });
-      return r.ok ? r.value.map(openLigaMatch) : [];
-    }));
-    jobs.push(settle(getJson(CFG.openliga + '/getbltable/bl1/2026')).then(function (r) {
-      srcResults.push({ name: 'OpenLigaDB · classement', ok: r.ok, count: r.ok ? r.value.length : 0, error: r.error });
-      return r.ok ? { comp: 'bl1', season: '2026/2027', rows: openLigaTable(r.value),
-                      label: 'Bundesliga · saison en cours (temps réel)', updated: new Date().toISOString().slice(0, 10),
-                      complete: true, live: true } : null;
-    }));
+    // --- 1. OpenLigaDB : Bundesliga 1 & 2 complètes (calendrier + classements)
+    OPENLIGA_LEAGUES.forEach(function (L) {
+      jobs.push(settle(getJson(CFG.openliga + '/getmatchdata/' + L.comp)).then(function (r) {
+        srcResults.push({ name: 'OpenLigaDB · matchs ' + L.label, ok: r.ok, count: r.ok ? r.value.length : 0, error: r.error });
+        return r.ok ? r.value.map(function (m) { return openLigaMatch(m, L.comp); }) : [];
+      }));
+      jobs.push(settle(getJson(CFG.openliga + '/getbltable/' + L.comp + '/' + L.season)).then(function (r) {
+        srcResults.push({ name: 'OpenLigaDB · classement ' + L.label, ok: r.ok, count: r.ok ? r.value.length : 0, error: r.error });
+        return r.ok ? { comp: L.comp, season: L.seasonLabel, rows: openLigaTable(r.value),
+                        label: L.name + ' · saison en cours (temps réel, ' + r.value.length + ' équipes)',
+                        updated: new Date().toISOString().slice(0, 10),
+                        complete: true, live: true } : null;
+      }));
+    });
 
     // --- 2. TheSportsDB : matchs du jour et de demain (tous championnats)
     [0, 1].forEach(function (offset) {
@@ -303,6 +322,7 @@
     saveSettings: saveSettings,
     status: STATUS,
     TSDB_LEAGUES: TSDB_LEAGUES,
+    OPENLIGA_LEAGUES: OPENLIGA_LEAGUES,
     tsdbEvent: tsdbEvent,
     openLigaMatch: openLigaMatch,
     getJson: getJson

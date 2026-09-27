@@ -49,7 +49,7 @@ check('pronostics rendus', doc.querySelectorAll('#proGrid .pro-card').length > 0
 check('puces compétitions', doc.querySelectorAll('#compChips .chip').length >= 5, doc.querySelectorAll('#compChips .chip').length+' puces');
 check('calendrier rendu', doc.querySelectorAll('#calendarBody .match-card').length > 0, doc.querySelectorAll('#calendarBody .match-card').length+' cartes');
 check('calendrier groupé par jour', doc.querySelectorAll('#calendarBody .section').length > 0, doc.querySelectorAll('#calendarBody .section').length+' jours');
-check('cartes compétitions', doc.querySelectorAll('#compGrid .comp-card').length === 9, doc.querySelectorAll('#compGrid .comp-card').length+' cartes');
+check('cartes compétitions', doc.querySelectorAll('#compGrid .comp-card').length === 10, doc.querySelectorAll('#compGrid .comp-card').length+' cartes');
 check('classement rendu', doc.querySelectorAll('#standingsBody table.standings tbody tr').length >= 15, doc.querySelectorAll('#standingsBody tbody tr').length+' lignes');
 check('KPIs bankroll', doc.querySelectorAll('#bankKpis .kpi').length === 8, doc.querySelectorAll('#bankKpis .kpi').length+' KPI');
 check('sélecteur de match bankroll', q('#betMatch').options.length > 5, q('#betMatch').options.length+' options');
@@ -60,18 +60,19 @@ check('validation modèle', doc.querySelectorAll('#validationBody tbody tr').len
 check('stats données', doc.querySelectorAll('#dataStats .kpi').length === 6);
 check('section Coupe du monde', /Espagne/.test(q('#wcBody').textContent) && /Argentine/.test(q('#wcBody').textContent));
 check('sources rendues', doc.querySelectorAll('#sourcesBody .card').length >= 4);
-check('stat total', q('#statTotal').textContent === '44', q('#statTotal').textContent);
+const TOTAL = win.ZACO_SNAPSHOT.matches.length;
+check('stat total', q('#statTotal').textContent === String(TOTAL), q('#statTotal').textContent + ' (snapshot : ' + TOTAL + ')');
 
 // --- interactions ---
 const chipPast = doc.querySelector('[data-filter-range="past"]');
 chipPast.dispatchEvent(new win.MouseEvent('click',{bubbles:true}));
 check('filtre "Terminés" actif', chipPast.classList.contains('is-active'));
 const nPast = doc.querySelectorAll('#calendarBody .match-card').length;
-check('filtre terminés → résultats', nPast > 0 && nPast < 44, nPast+' cartes');
+check('filtre terminés → résultats', nPast > 0 && nPast < TOTAL, nPast+' cartes');
 
 const chipAll = doc.querySelector('[data-filter-range="all"]');
 chipAll.dispatchEvent(new win.MouseEvent('click',{bubbles:true}));
-check('filtre "Tout" → 44', doc.querySelectorAll('#calendarBody .match-card').length === 44, doc.querySelectorAll('#calendarBody .match-card').length+' cartes');
+check('filtre "Tout" → tout', doc.querySelectorAll('#calendarBody .match-card').length === TOTAL, doc.querySelectorAll('#calendarBody .match-card').length+' cartes / '+TOTAL);
 
 const search = q('#searchInput');
 search.value = 'bayern'; search.dispatchEvent(new win.Event('input',{bubbles:true}));

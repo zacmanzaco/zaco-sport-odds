@@ -97,6 +97,9 @@
     { id: 'bl1', name: 'Bundesliga', full: '1. Fußball-Bundesliga', country: 'Allemagne', flag: '🇩🇪',
       type: 'Championnat', season: '2026/2027', live: true,
       badge: null, accent: '#d20515', source: 'OpenLigaDB' },
+    { id: 'bl2', name: '2. Bundesliga', full: '2. Fußball-Bundesliga', country: 'Allemagne', flag: '🇩🇪',
+      type: 'Championnat', season: '2026/2027', live: true,
+      badge: null, accent: '#7c4dff', source: 'OpenLigaDB' },
     { id: 'pl', name: 'Premier League', full: 'English Premier League', country: 'Angleterre', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
       type: 'Championnat', season: '2026/2027', live: false,
       badge: 'https://r2.thesportsdb.com/images/media/league/badge/gasy9d1737743125.png', accent: '#3d195b', source: 'TheSportsDB' },
@@ -191,6 +194,58 @@
     });
   });
 
+  /* ===== 2. BUNDESLIGA 2026/2027 — journées 6 (résultats) & 7 (OpenLigaDB) */
+  // Journée 6 — résultats réels (18-20 sept. 2026), buteurs inclus
+  var BL2_J6 = [
+    ['83591', '2026-09-18T16:30:00Z', 'wolfsburg', 'VfL Wolfsburg', 'darmstadt', 'SV Darmstadt 98',
+      'Volkswagen Arena, Wolfsbourg', 5, 1, [['A. Bernhardsson', 14], ['R. Glatzel', 40],
+      ['A. Bernhardsson', 61], ['M. Damar', 67], ['R. Glatzel', 79]],
+      [['Milan Smit', 29]]],
+    ['83606', '2026-09-18T16:30:00Z', 'fuerth', 'SpVgg Greuther Fürth', 'magdeburg', '1. FC Magdeburg',
+      'Sportpark Ronhof, Fürth', 1, 1, [['Omar Sillah', 20]], [['E. Iyoha', 5]]],
+    ['83595', '2026-09-19T11:00:00Z', 'kaiserslautern', '1. FC Kaiserslautern', 'braunschweig', 'Eintracht Braunschweig',
+      'Fritz-Walter-Stadion, Kaiserslautern', 1, 0, [['Erencan Yardimci', 73]], []],
+    ['83597', '2026-09-19T11:00:00Z', 'karlsruhe', 'Karlsruher SC', 'nuernberg', '1. FC Nürnberg',
+      'Wildparkstadion, Karlsruhe', 0, 1, [], [['Mohamed Alì Zoma', 30]]],
+    ['83600', '2026-09-19T11:00:00Z', 'kiel', 'Holstein Kiel', 'osnabrueck', 'VfL Osnabrück',
+      'Holstein-Stadion, Kiel', 1, 1, [['Phil Harres', 45, true]], [['Hiroki Sekine', 72]]],
+    ['83598', '2026-09-19T18:30:00Z', 'dresden', 'Dynamo Dresden', 'hertha', 'Hertha BSC',
+      'Rudolf-Harbig-Stadion, Dresde', 1, 2, [['Patrice Covic', 10]],
+      [['Jón Dagur Thorsteinsson', 29], ['Jón Dagur Thorsteinsson', 80]]],
+    ['83593', '2026-09-20T11:30:00Z', 'hannover', 'Hannover 96', 'bochum', 'VfL Bochum',
+      'Heinz von Heiden Arena, Hanovre', 2, 1, [['S. Teitur Thórdarson', 24], ['M. Hartel', 43]],
+      [['T. Meyer', 77]]],
+    ['83604', '2026-09-20T11:30:00Z', 'bielefeld', 'DSC Arminia Bielefeld', 'heidenheim', '1. FC Heidenheim 1846',
+      'SchücoArena, Bielefeld', 2, 2, [['Joel Grodowski', 13], ['Felix Hagmann', 55]],
+      [['B. Zivzivadze', 30, true], ['P. Hennrich', 48]]],
+    ['83607', '2026-09-20T11:30:00Z', 'cottbus', 'Energie Cottbus', 'stpauli', 'FC St. Pauli',
+      'Stadion der Freundschaft, Cottbus', 1, 1, [['J. Butler', 37]], [['M. Kaars', 80]]]
+  ];
+  BL2_J6.forEach(function (r) {
+    var scorers = r[9].map(function (g) { return [g[0], g[1], r[2]].concat(g[2] ? [true] : []); })
+      .concat(r[10].map(function (g) { return [g[0], g[1], r[4]].concat(g[2] ? [true] : []); }));
+    match({ id: 'ol-' + r[0], comp: 'bl2', round: '6e journée', ts: r[1], status: 'FT', venue: r[6],
+      homeId: r[2], home: r[3], awayId: r[4], away: r[5], hg: r[7], ag: r[8],
+      scorers: scorers.length ? scorers : null });
+  });
+
+  // Journée 7 — à venir (9-11 oct. 2026)
+  var BL2_J7 = [
+    ['83609', '2026-10-09T16:30:00Z', 'heidenheim', '1. FC Heidenheim 1846', 'kaiserslautern', '1. FC Kaiserslautern', 'Voith-Arena, Heidenheim'],
+    ['83620', '2026-10-09T16:30:00Z', 'braunschweig', 'Eintracht Braunschweig', 'kiel', 'Holstein Kiel', 'Eintracht-Stadion, Brunswick'],
+    ['83611', '2026-10-10T11:00:00Z', 'darmstadt', 'SV Darmstadt 98', 'cottbus', 'Energie Cottbus', 'Merck-Stadion am Böllenfalltor, Darmstadt'],
+    ['83617', '2026-10-10T11:00:00Z', 'magdeburg', '1. FC Magdeburg', 'hannover', 'Hannover 96', 'Avnet Arena, Magdebourg'],
+    ['83622', '2026-10-10T11:00:00Z', 'osnabrueck', 'VfL Osnabrück', 'dresden', 'Dynamo Dresden', 'Bremer Brücke, Osnabrück'],
+    ['83615', '2026-10-10T18:30:00Z', 'nuernberg', '1. FC Nürnberg', 'wolfsburg', 'VfL Wolfsburg', 'Max-Morlock-Stadion, Nuremberg'],
+    ['83608', '2026-10-11T11:30:00Z', 'stpauli', 'FC St. Pauli', 'karlsruhe', 'Karlsruher SC', 'Millerntor-Stadion, Hambourg'],
+    ['83613', '2026-10-11T11:30:00Z', 'hertha', 'Hertha BSC', 'fuerth', 'SpVgg Greuther Fürth', 'Olympiastadion, Berlin'],
+    ['83616', '2026-10-11T11:30:00Z', 'bochum', 'VfL Bochum', 'bielefeld', 'DSC Arminia Bielefeld', 'Vonovia Ruhrstadion, Bochum']
+  ];
+  BL2_J7.forEach(function (r) {
+    match({ id: 'ol-' + r[0], comp: 'bl2', round: '7e journée', ts: r[1], status: 'NS', venue: r[6],
+      homeId: r[2], home: r[3], awayId: r[4], away: r[5], hg: null, ag: null });
+  });
+
   /* ===== Autres championnats — matchs réels (TheSportsDB) ================ */
   match({ id: 'ts-2506231', comp: 'laliga', round: '7e journée', ts: '2026-09-20T19:00:00Z', status: 'FT',
     venue: 'Estadio de Mestalla, Valence', homeId: 'valencia', home: 'Valencia',
@@ -248,106 +303,199 @@
           'L\'Argentine termine à 10 après l\'exclusion d\'Enzo Fernández (2e jaune, 90+).' });
 
   /* --- Classements ------------------------------------------------------ */
-  function R(id, n, b, pl, w, d, l, gf, ga, pts, form, note) {
+  /* R(id, nom, joués, gagnés, nuls, perdus, buts pour, buts contre, points, forme, note) */
+  function R(id, n, pl, w, d, l, gf, ga, pts, form, note) {
     return { id: id, n: n, b: badge(id), pl: pl, w: w, d: d, l: l, gf: gf, ga: ga,
              gd: gf - ga, pts: pts, form: form || null, note: note || null };
   }
 
   var tables = [
-    /* --- Bundesliga 2026/2027 — classement COMPLET (OpenLigaDB) ---------- */
+    /* ===================================================================
+     * BUNDESLIGA 1 — OpenLigaDB, classements COMPLETS (aucune limite d'API)
+     * =================================================================== */
     { comp: 'bl1', season: '2026/2027', label: 'Bundesliga · saison en cours (après 4 journées)',
-      updated: '2026-09-24', complete: true, rows: [
-      R('dortmund', 'Borussia Dortmund', 1, 4, 4, 0, 0, 9, 2, 12, null, 'Champions League'),
-      R('bayern', 'FC Bayern München', 1, 4, 3, 1, 0, 14, 2, 10, null, 'Champions League'),
-      R('freiburg', 'SC Freiburg', 1, 4, 3, 1, 0, 12, 3, 10, null, 'Champions League'),
-      R('augsburg', 'FC Augsburg', 1, 4, 2, 1, 1, 11, 6, 7, null, 'Champions League'),
-      R('leverkusen', 'Bayer 04 Leverkusen', 1, 4, 2, 1, 1, 10, 5, 7, null, 'Europa League'),
-      R('mainz', '1. FSV Mainz 05', 1, 4, 2, 1, 1, 10, 6, 7, null, 'Conference League'),
-      R('elversberg', 'SV 07 Elversberg', 1, 4, 2, 1, 1, 8, 7, 7, null, null),
-      R('bremen', 'SV Werder Bremen', 1, 4, 2, 1, 1, 8, 8, 7, null, null),
-      R('leipzig', 'RB Leipzig', 1, 4, 2, 0, 2, 9, 5, 6, null, null),
-      R('frankfurt', 'Eintracht Frankfurt', 1, 4, 1, 2, 1, 9, 10, 5, null, null),
-      R('schalke', 'FC Schalke 04', 1, 4, 1, 2, 1, 3, 4, 5, null, null),
-      R('paderborn', 'SC Paderborn 07', 1, 4, 1, 1, 2, 3, 5, 4, null, null),
-      R('koeln', '1. FC Köln', 1, 4, 1, 1, 2, 6, 9, 4, null, null),
-      R('hoffenheim', 'TSG Hoffenheim', 1, 4, 1, 0, 3, 7, 10, 3, null, null),
-      R('stuttgart', 'VfB Stuttgart', 1, 4, 1, 0, 3, 6, 9, 3, null, null),
-      R('hsv', 'Hamburger SV', 1, 4, 1, 0, 3, 2, 13, 3, null, null),
-      R('union', '1. FC Union Berlin', 1, 4, 0, 1, 3, 4, 17, 1, null, null),
-      R('gladbach', 'Borussia Mönchengladbach', 1, 4, 0, 0, 4, 6, 16, 0, null, 'Zone de barrage')
+      updated: '2026-09-24', complete: true, live: true, rows: [
+      R('dortmund', 'Borussia Dortmund', 4, 4, 0, 0, 9, 2, 12, null, 'Champions League'),
+      R('bayern', 'FC Bayern München', 4, 3, 1, 0, 14, 2, 10, null, 'Champions League'),
+      R('freiburg', 'SC Freiburg', 4, 3, 1, 0, 12, 3, 10, null, 'Champions League'),
+      R('augsburg', 'FC Augsburg', 4, 2, 1, 1, 11, 6, 7, null, 'Champions League'),
+      R('leverkusen', 'Bayer 04 Leverkusen', 4, 2, 1, 1, 10, 5, 7, null, 'Europa League'),
+      R('mainz', '1. FSV Mainz 05', 4, 2, 1, 1, 10, 6, 7, null, 'Conference League'),
+      R('elversberg', 'SV 07 Elversberg', 4, 2, 1, 1, 8, 7, 7, null, null),
+      R('bremen', 'SV Werder Bremen', 4, 2, 1, 1, 8, 8, 7, null, null),
+      R('leipzig', 'RB Leipzig', 4, 2, 0, 2, 9, 5, 6, null, null),
+      R('frankfurt', 'Eintracht Frankfurt', 4, 1, 2, 1, 9, 10, 5, null, null),
+      R('schalke', 'FC Schalke 04', 4, 1, 2, 1, 3, 4, 5, null, null),
+      R('paderborn', 'SC Paderborn 07', 4, 1, 1, 2, 3, 5, 4, null, null),
+      R('koeln', '1. FC Köln', 4, 1, 1, 2, 6, 9, 4, null, null),
+      R('hoffenheim', 'TSG Hoffenheim', 4, 1, 0, 3, 7, 10, 3, null, null),
+      R('stuttgart', 'VfB Stuttgart', 4, 1, 0, 3, 6, 9, 3, null, null),
+      R('hsv', 'Hamburger SV', 4, 1, 0, 3, 2, 13, 3, null, null),
+      R('union', '1. FC Union Berlin', 4, 0, 1, 3, 4, 17, 1, null, null),
+      R('gladbach', 'Borussia Mönchengladbach', 4, 0, 0, 4, 6, 16, 0, null, 'Barrage de relégation')
     ] },
 
-    /* --- Bundesliga 2025/2026 — classement final COMPLET (OpenLigaDB) ---- */
-    { comp: 'bl1', season: '2025/2026', label: 'Bundesliga · classement final 2025/2026',
+    { comp: 'bl1', season: '2025/2026', label: 'Bundesliga · classement final 2025/2026 (18 équipes)',
       updated: '2026-05-16', complete: true, historical: true, rows: [
-      R('bayern', 'FC Bayern München', 1, 34, 28, 5, 1, 122, 36, 89, null, 'Champion'),
-      R('dortmund', 'Borussia Dortmund', 1, 34, 22, 7, 5, 70, 34, 73, null, 'Champions League'),
-      R('leipzig', 'RB Leipzig', 1, 34, 20, 5, 9, 66, 47, 65, null, 'Champions League'),
-      R('stuttgart', 'VfB Stuttgart', 1, 34, 18, 8, 8, 71, 49, 62, null, 'Champions League'),
-      R('hoffenheim', 'TSG Hoffenheim', 1, 34, 18, 7, 9, 65, 52, 61, null, 'Europa League'),
-      R('leverkusen', 'Bayer 04 Leverkusen', 1, 34, 17, 8, 9, 68, 47, 59, null, 'Europa League'),
-      R('freiburg', 'SC Freiburg', 1, 34, 13, 8, 13, 51, 57, 47, null, null),
-      R('frankfurt', 'Eintracht Frankfurt', 1, 34, 11, 11, 12, 61, 65, 44, null, null),
-      R('augsburg', 'FC Augsburg', 1, 34, 12, 7, 15, 45, 61, 43, null, null),
-      R('mainz', '1. FSV Mainz 05', 1, 34, 10, 10, 14, 44, 53, 40, null, null),
-      R('union', '1. FC Union Berlin', 1, 34, 10, 9, 15, 44, 58, 39, null, null),
-      R('gladbach', 'Borussia Mönchengladbach', 1, 34, 9, 11, 14, 42, 53, 38, null, null),
-      R('hsv', 'Hamburger SV', 1, 34, 9, 11, 14, 40, 54, 38, null, null),
-      R('koeln', '1. FC Köln', 1, 34, 7, 11, 16, 49, 63, 32, null, null),
-      R('bremen', 'SV Werder Bremen', 1, 34, 8, 8, 18, 37, 60, 32, null, null),
-      R('wolfsburg', 'VfL Wolfsburg', 1, 34, 7, 8, 19, 45, 69, 29, null, 'Barrage de relégation'),
-      R('heidenheim', '1. FC Heidenheim 1846', 1, 34, 6, 8, 20, 41, 72, 26, null, 'Relégué'),
-      R('stpauli', 'FC St. Pauli', 1, 34, 6, 8, 20, 29, 60, 26, null, 'Relégué')
+      R('bayern', 'FC Bayern München', 34, 28, 5, 1, 122, 36, 89, null, 'Champion'),
+      R('dortmund', 'Borussia Dortmund', 34, 22, 7, 5, 70, 34, 73, null, 'Champions League'),
+      R('leipzig', 'RB Leipzig', 34, 20, 5, 9, 66, 47, 65, null, 'Champions League'),
+      R('stuttgart', 'VfB Stuttgart', 34, 18, 8, 8, 71, 49, 62, null, 'Champions League'),
+      R('hoffenheim', 'TSG Hoffenheim', 34, 18, 7, 9, 65, 52, 61, null, 'Europa League'),
+      R('leverkusen', 'Bayer 04 Leverkusen', 34, 17, 8, 9, 68, 47, 59, null, 'Europa League'),
+      R('freiburg', 'SC Freiburg', 34, 13, 8, 13, 51, 57, 47, null, null),
+      R('frankfurt', 'Eintracht Frankfurt', 34, 11, 11, 12, 61, 65, 44, null, null),
+      R('augsburg', 'FC Augsburg', 34, 12, 7, 15, 45, 61, 43, null, null),
+      R('mainz', '1. FSV Mainz 05', 34, 10, 10, 14, 44, 53, 40, null, null),
+      R('union', '1. FC Union Berlin', 34, 10, 9, 15, 44, 58, 39, null, null),
+      R('gladbach', 'Borussia Mönchengladbach', 34, 9, 11, 14, 42, 53, 38, null, null),
+      R('hsv', 'Hamburger SV', 34, 9, 11, 14, 40, 54, 38, null, null),
+      R('koeln', '1. FC Köln', 34, 7, 11, 16, 49, 63, 32, null, null),
+      R('bremen', 'SV Werder Bremen', 34, 8, 8, 18, 37, 60, 32, null, null),
+      R('wolfsburg', 'VfL Wolfsburg', 34, 7, 8, 19, 45, 69, 29, null, 'Barrage de relégation'),
+      R('heidenheim', '1. FC Heidenheim 1846', 34, 6, 8, 20, 41, 72, 26, null, 'Relégué'),
+      R('stpauli', 'FC St. Pauli', 34, 6, 8, 20, 29, 60, 26, null, 'Relégué')
     ] },
 
-    /* --- Premier League 2025/2026 — top 5 (TheSportsDB) ------------------ */
-    { comp: 'pl', season: '2025/2026', label: 'Premier League · final 2025/2026 (top 5)',
-      updated: '2026-06-12', complete: false, historical: true, rows: [
-      R('arsenal', 'Arsenal', 1, 38, 26, 7, 5, 71, 27, 85, 'WWWWW', 'Champion'),
-      R('man city', 'Manchester City', 1, 38, 23, 9, 6, 77, 35, 78, 'LDWWD', 'Champions League'),
-      R('man united', 'Manchester United', 1, 38, 20, 11, 7, 69, 50, 71, 'WWDWW', 'Champions League'),
-      R('aston villa', 'Aston Villa', 1, 38, 19, 8, 11, 56, 49, 65, 'WWDLL', 'Champions League'),
-      R('liverpool', 'Liverpool', 1, 38, 17, 9, 12, 63, 53, 60, 'DLDLW', 'Champions League')
+    /* ===================================================================
+     * BUNDESLIGA 2 — OpenLigaDB, classement COMPLET en temps réel
+     * =================================================================== */
+    { comp: 'bl2', season: '2026/2027', label: '2. Bundesliga · saison en cours (après 6 journées)',
+      updated: '2026-09-24', complete: true, live: true, rows: [
+      R('hertha', 'Hertha BSC', 6, 6, 0, 0, 17, 7, 18, null, 'Promotion'),
+      R('nuernberg', '1. FC Nürnberg', 6, 5, 1, 0, 16, 6, 16, null, 'Promotion'),
+      R('heidenheim', '1. FC Heidenheim 1846', 6, 4, 1, 1, 14, 12, 13, null, 'Barrage'),
+      R('wolfsburg', 'VfL Wolfsburg', 6, 3, 2, 1, 15, 8, 11, null, null),
+      R('kaiserslautern', '1. FC Kaiserslautern', 6, 3, 2, 1, 6, 4, 11, null, null),
+      R('magdeburg', '1. FC Magdeburg', 6, 3, 1, 2, 11, 9, 10, null, null),
+      R('cottbus', 'Energie Cottbus', 6, 2, 2, 2, 14, 13, 8, null, null),
+      R('stpauli', 'FC St. Pauli', 6, 1, 4, 1, 8, 8, 7, null, null),
+      R('bochum', 'VfL Bochum', 6, 2, 1, 3, 5, 6, 7, null, null),
+      R('hannover', 'Hannover 96', 6, 2, 1, 3, 7, 9, 7, null, null),
+      R('osnabrueck', 'VfL Osnabrück', 6, 2, 1, 3, 9, 12, 7, null, null),
+      R('fuerth', 'SpVgg Greuther Fürth', 6, 1, 3, 2, 9, 11, 6, null, null),
+      R('bielefeld', 'DSC Arminia Bielefeld', 6, 1, 2, 3, 10, 12, 5, null, null),
+      R('karlsruhe', 'Karlsruher SC', 6, 1, 2, 3, 6, 12, 5, null, null),
+      R('braunschweig', 'Eintracht Braunschweig', 6, 1, 1, 4, 12, 13, 4, null, null),
+      R('kiel', 'Holstein Kiel', 6, 0, 4, 2, 7, 10, 4, null, null),
+      R('dresden', 'Dynamo Dresden', 6, 1, 1, 4, 8, 14, 4, null, null),
+      R('darmstadt', 'SV Darmstadt 98', 6, 1, 1, 4, 5, 13, 4, null, 'Relégation')
     ] },
 
-    /* --- Premier League 2026/2027 — top 5, saison en cours -------------- */
-    { comp: 'pl', season: '2026/2027', label: 'Premier League · saison en cours (après 5 journées, top 5)',
-      updated: '2026-09-24', complete: false, rows: [
-      R('man city', 'Manchester City', 1, 5, 5, 0, 0, 13, 5, 15, 'WWWWW', null),
-      R('arsenal', 'Arsenal', 1, 5, 4, 0, 1, 8, 4, 12, 'LWWWW', null),
-      R('brighton', 'Brighton and Hove Albion', 1, 5, 3, 1, 1, 16, 5, 10, 'WWDLW', null),
-      R('brentford', 'Brentford', 1, 5, 2, 3, 0, 10, 4, 9, 'WDDDW', null),
-      R('leeds', 'Leeds United', 1, 5, 2, 3, 0, 7, 3, 9, 'DWDDW', null)
+    /* ===================================================================
+     * PREMIER LEAGUE 2025/2026 — classement final COMPLET (Wikipédia,
+     * recoupé à l'identique avec TheSportsDB sur le top 5)
+     * =================================================================== */
+    { comp: 'pl', season: '2025/2026', label: 'Premier League · classement final 2025/2026 (20 équipes)',
+      updated: '2026-05-24', complete: true, historical: true, rows: [
+      R('arsenal', 'Arsenal', 38, 26, 7, 5, 71, 27, 85, null, 'Champion'),
+      R('man city', 'Manchester City', 38, 23, 9, 6, 77, 35, 78, null, 'Champions League'),
+      R('man united', 'Manchester United', 38, 20, 11, 7, 69, 50, 71, null, 'Champions League'),
+      R('aston villa', 'Aston Villa', 38, 19, 8, 11, 56, 49, 65, null, 'Champions League'),
+      R('liverpool', 'Liverpool', 38, 17, 9, 12, 63, 53, 60, null, 'Champions League'),
+      R('bournemouth', 'Bournemouth', 38, 13, 18, 7, 58, 54, 57, null, 'Europa League'),
+      R('sunderland', 'Sunderland', 38, 14, 12, 12, 42, 48, 54, null, 'Europa League'),
+      R('brighton', 'Brighton & Hove Albion', 38, 14, 11, 13, 52, 46, 53, null, 'Conference League'),
+      R('brentford', 'Brentford', 38, 14, 11, 13, 55, 52, 53, null, null),
+      R('chelsea', 'Chelsea', 38, 14, 10, 14, 58, 52, 52, null, null),
+      R('fulham', 'Fulham', 38, 15, 7, 16, 47, 51, 52, null, null),
+      R('newcastle', 'Newcastle United', 38, 14, 7, 17, 53, 55, 49, null, null),
+      R('everton', 'Everton', 38, 13, 10, 15, 47, 50, 49, null, null),
+      R('leeds', 'Leeds United', 38, 11, 14, 13, 49, 56, 47, null, null),
+      R('crystal palace', 'Crystal Palace', 38, 11, 12, 15, 41, 51, 45, null, 'Europa League'),
+      R('nottm forest', 'Nottingham Forest', 38, 11, 11, 16, 48, 51, 44, null, null),
+      R('tottenham', 'Tottenham Hotspur', 38, 10, 11, 17, 48, 57, 41, null, null),
+      R('west ham', 'West Ham United', 38, 10, 9, 19, 46, 65, 39, null, 'Relégué'),
+      R('burnley', 'Burnley', 38, 4, 10, 24, 38, 75, 22, null, 'Relégué'),
+      R('wolves', 'Wolverhampton Wanderers', 38, 3, 11, 24, 27, 68, 20, null, 'Relégué')
     ] },
 
-    /* --- LaLiga 2025/2026 — top 5 (TheSportsDB) ------------------------- */
-    { comp: 'laliga', season: '2025/2026', label: 'LaLiga · final 2025/2026 (top 5)',
-      updated: '2026-06-12', complete: false, historical: true, rows: [
-      R('barcelona', 'Barcelona', 1, 38, 31, 1, 6, 95, 36, 94, 'LWLWW', 'Champion'),
-      R('real madrid', 'Real Madrid', 1, 38, 27, 5, 6, 77, 35, 86, 'WWWLW', 'Champions League'),
-      R('villarreal', 'Villarreal', 1, 38, 22, 6, 10, 72, 46, 72, 'WLLDW', 'Champions League'),
-      R('atletico', 'Atlético Madrid', 1, 38, 21, 6, 11, 62, 44, 69, 'LWWLW', 'Champions League'),
-      R('betis', 'Real Betis', 1, 38, 15, 15, 8, 59, 48, 60, 'WLWDW', 'Champions League')
+    { comp: 'pl', season: '2026/2027', label: 'Premier League · saison en cours (après 5 journées, top 5 — limite de l\'API gratuite)',
+      updated: '2026-09-24', complete: false, live: true, rows: [
+      R('man city', 'Manchester City', 5, 5, 0, 0, 13, 5, 15, 'WWWWW', null),
+      R('arsenal', 'Arsenal', 5, 4, 0, 1, 8, 4, 12, 'LWWWW', null),
+      R('brighton', 'Brighton and Hove Albion', 5, 3, 1, 1, 16, 5, 10, 'WWDLW', null),
+      R('brentford', 'Brentford', 5, 2, 3, 0, 10, 4, 9, 'WDDDW', null),
+      R('leeds', 'Leeds United', 5, 2, 3, 0, 7, 3, 9, 'DWDDW', null)
     ] },
 
-    /* --- Ligue 1 2025/2026 — top 5 (TheSportsDB) ------------------------ */
-    { comp: 'ligue1', season: '2025/2026', label: 'Ligue 1 · final 2025/2026 (top 5)',
-      updated: '2026-06-11', complete: false, historical: true, rows: [
-      R('psg', 'Paris Saint-Germain', 1, 34, 24, 4, 6, 74, 29, 76, 'LWWDW', 'Champion'),
-      R('lens', 'Lens', 1, 34, 22, 4, 8, 66, 35, 70, 'WLWDD', 'Champions League'),
-      R('lille', 'Lille', 1, 34, 18, 7, 9, 52, 37, 61, 'LWDWD', 'Champions League'),
-      R('lyon', 'Lyon', 1, 34, 18, 6, 10, 53, 40, 60, 'LLWWW', 'Barrages CL'),
-      R('marseille', 'Marseille', 1, 34, 18, 5, 11, 63, 45, 59, 'WWLDL', 'Europa League')
+    /* ===================================================================
+     * LALIGA 2025/2026 — classement final COMPLET (20 équipes)
+     * =================================================================== */
+    { comp: 'laliga', season: '2025/2026', label: 'LaLiga · classement final 2025/2026 (20 équipes)',
+      updated: '2026-05-24', complete: true, historical: true, rows: [
+      R('barcelona', 'Barcelona', 38, 31, 1, 6, 95, 36, 94, null, 'Champion'),
+      R('real madrid', 'Real Madrid', 38, 27, 5, 6, 77, 35, 86, null, 'Champions League'),
+      R('villarreal', 'Villarreal', 38, 22, 6, 10, 72, 46, 72, null, 'Champions League'),
+      R('atletico', 'Atlético Madrid', 38, 21, 6, 11, 62, 44, 69, null, 'Champions League'),
+      R('betis', 'Real Betis', 38, 15, 15, 8, 59, 48, 60, null, 'Champions League'),
+      R('celta vigo', 'Celta Vigo', 38, 14, 12, 12, 53, 48, 54, null, 'Europa League'),
+      R('getafe', 'Getafe', 38, 15, 6, 17, 32, 38, 51, null, 'Conference League'),
+      R('rayo', 'Rayo Vallecano', 38, 12, 14, 12, 41, 44, 50, null, null),
+      R('valencia', 'Valencia', 38, 13, 10, 15, 46, 55, 49, null, null),
+      R('real sociedad', 'Real Sociedad', 38, 11, 13, 14, 59, 61, 46, null, 'Europa League'),
+      R('espanyol', 'Espanyol', 38, 12, 10, 16, 43, 55, 46, null, null),
+      R('athletic bilbao', 'Athletic Bilbao', 38, 13, 6, 19, 43, 58, 45, null, null),
+      R('sevilla', 'Sevilla', 38, 12, 7, 19, 46, 60, 43, null, null),
+      R('alaves', 'Alavés', 38, 11, 10, 17, 44, 56, 43, null, null),
+      R('elche', 'Elche', 38, 10, 13, 15, 49, 57, 43, null, null),
+      R('levante', 'Levante', 38, 11, 9, 18, 47, 61, 42, null, null),
+      R('osasuna', 'Osasuna', 38, 11, 9, 18, 44, 50, 42, null, null),
+      R('mallorca', 'Mallorca', 38, 11, 9, 18, 47, 57, 42, null, 'Relégué'),
+      R('girona', 'Girona', 38, 9, 14, 15, 39, 55, 41, null, 'Relégué'),
+      R('real oviedo', 'Real Oviedo', 38, 6, 11, 21, 26, 60, 29, null, 'Relégué')
     ] },
 
-    /* --- Bundesliga 2025/2026 — top 5 (TheSportsDB, recoupement) -------- */
-    { comp: 'bl1', season: '2025/2026', label: 'Bundesliga · final 2025/2026 (top 5)',
-      updated: '2026-06-12', complete: false, historical: true, rows: [
-      R('bayern', 'Bayern Munich', 1, 34, 28, 5, 1, 122, 36, 89, 'WWDWW', 'Champion'),
-      R('dortmund', 'Borussia Dortmund', 1, 34, 22, 7, 5, 70, 34, 73, 'WWLWL', 'Champions League'),
-      R('leipzig', 'RB Leipzig', 1, 34, 20, 5, 9, 66, 47, 65, 'LWLWW', 'Champions League'),
-      R('stuttgart', 'Stuttgart', 1, 34, 18, 8, 8, 71, 49, 62, 'DWDDL', 'Champions League'),
-      R('hoffenheim', 'Hoffenheim', 1, 34, 18, 7, 9, 65, 52, 61, 'LWDWW', 'Europa League')
+    /* ===================================================================
+     * SERIE A 2025/2026 — classement final COMPLET (20 équipes)
+     * =================================================================== */
+    { comp: 'seriea', season: '2025/2026', label: 'Serie A · classement final 2025/2026 (20 équipes)',
+      updated: '2026-05-24', complete: true, historical: true, rows: [
+      R('inter', 'Inter Milan', 38, 27, 6, 5, 89, 35, 87, null, 'Champion'),
+      R('napoli', 'Napoli', 38, 23, 7, 8, 58, 36, 76, null, 'Champions League'),
+      R('roma', 'Roma', 38, 23, 4, 11, 59, 31, 73, null, 'Champions League'),
+      R('como', 'Como', 38, 20, 11, 7, 65, 29, 71, null, 'Champions League'),
+      R('ac milan', 'AC Milan', 38, 20, 10, 8, 53, 35, 70, null, 'Champions League'),
+      R('juventus', 'Juventus', 38, 19, 12, 7, 61, 34, 69, null, 'Europa League'),
+      R('atalanta', 'Atalanta', 38, 15, 14, 9, 51, 36, 59, null, 'Conference League'),
+      R('bologna', 'Bologna', 38, 16, 8, 14, 49, 46, 56, null, null),
+      R('lazio', 'Lazio', 38, 14, 12, 12, 41, 40, 54, null, null),
+      R('udinese', 'Udinese', 38, 14, 8, 16, 45, 48, 50, null, null),
+      R('sassuolo', 'Sassuolo', 38, 14, 7, 17, 46, 50, 49, null, null),
+      R('torino', 'Torino', 38, 12, 9, 17, 44, 63, 45, null, null),
+      R('parma', 'Parma', 38, 11, 12, 15, 28, 46, 45, null, null),
+      R('cagliari', 'Cagliari', 38, 11, 10, 17, 40, 53, 43, null, null),
+      R('fiorentina', 'Fiorentina', 38, 9, 15, 14, 41, 50, 42, null, null),
+      R('genoa', 'Genoa', 38, 10, 11, 17, 41, 51, 41, null, null),
+      R('lecce', 'Lecce', 38, 10, 8, 20, 28, 50, 38, null, null),
+      R('cremonese', 'Cremonese', 38, 8, 10, 20, 32, 57, 34, null, 'Relégué'),
+      R('verona', 'Hellas Verona', 38, 3, 12, 23, 25, 61, 21, null, 'Relégué'),
+      R('pisa', 'Pisa', 38, 2, 12, 24, 26, 71, 18, null, 'Relégué')
+    ] },
+
+    /* ===================================================================
+     * LIGUE 1 2025/2026 — classement final COMPLET (18 équipes)
+     * =================================================================== */
+    { comp: 'ligue1', season: '2025/2026', label: 'Ligue 1 · classement final 2025/2026 (18 équipes)',
+      updated: '2026-05-24', complete: true, historical: true, rows: [
+      R('psg', 'Paris Saint-Germain', 34, 24, 4, 6, 74, 29, 76, null, 'Champion'),
+      R('lens', 'Lens', 34, 22, 4, 8, 66, 35, 70, null, 'Champions League'),
+      R('lille', 'Lille', 34, 18, 7, 9, 52, 37, 61, null, 'Champions League'),
+      R('lyon', 'Lyon', 34, 18, 6, 10, 53, 40, 60, null, 'Barrages CL'),
+      R('marseille', 'Marseille', 34, 18, 5, 11, 63, 45, 59, null, 'Europa League'),
+      R('rennes', 'Rennes', 34, 17, 8, 9, 59, 50, 59, null, 'Europa League'),
+      R('monaco', 'Monaco', 34, 16, 6, 12, 60, 54, 54, null, 'Conference League'),
+      R('strasbourg', 'Strasbourg', 34, 15, 8, 11, 58, 47, 53, null, null),
+      R('toulouse', 'Toulouse', 34, 12, 9, 13, 47, 46, 45, null, null),
+      R('lorient', 'Lorient', 34, 11, 12, 11, 48, 51, 45, null, null),
+      R('paris fc', 'Paris FC', 34, 11, 11, 12, 47, 50, 44, null, null),
+      R('brest', 'Brest', 34, 10, 9, 15, 43, 55, 39, null, null),
+      R('angers', 'Angers', 34, 9, 9, 16, 29, 48, 36, null, null),
+      R('le havre', 'Le Havre', 34, 7, 14, 13, 32, 44, 35, null, null),
+      R('auxerre', 'Auxerre', 34, 8, 10, 16, 34, 44, 34, null, null),
+      R('nice', 'Nice', 34, 7, 11, 16, 37, 60, 32, null, 'Barrage'),
+      R('nantes', 'Nantes', 34, 5, 9, 20, 29, 52, 24, null, 'Relégué'),
+      R('metz', 'Metz', 34, 3, 8, 23, 32, 76, 17, null, 'Relégué')
     ] }
   ];
 

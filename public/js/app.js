@@ -77,6 +77,12 @@
     return STATE.comps.filter(function (c) { return c.id === id; })[0] || null;
   }
 
+  /** Rang d'affichage d'une compétition (ordre de déclaration du snapshot). */
+  function compOrder(id) {
+    var i = STATE.comps.map(function (c) { return c.id; }).indexOf(id);
+    return i < 0 ? 99 : i;
+  }
+
   function applyData(liveMatches, liveTables) {
     STATE.comps = (STATE.snapshot.competitions || []).slice();
 
@@ -105,6 +111,10 @@
 
     STATE.matches = Object.keys(byId).map(function (k) { return byId[k]; });
 
+    // Le match de démonstration live est réinjecté : une synchronisation en
+    // arrière-plan ne doit pas le faire disparaître de la section Direct.
+    if (STATE.live.demoMatch) STATE.matches.unshift(STATE.live.demoMatch);
+
     // tables : une entrée par (compétition, saison), la plus fraîche gagne
     var key = {};
     (STATE.snapshot.tables || []).forEach(function (t) { key[t.comp + '|' + t.season] = Object.assign({}, t); });
@@ -115,6 +125,18 @@
       key[t.comp + '|' + t.season] = t;
     });
     STATE.tables = Object.keys(key).map(function (k) { return key[k]; });
+
+    // Classements remis dans l'ordre officiel (points, différence de buts,
+    // buts marqués) : indispensable puisque les lignes viennent de sources
+    // différentes (snapshot, OpenLigaDB, TheSportsDB).
+    STATE.tables.forEach(function (t) {
+      t.rows.sort(function (a, b) {
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.gd !== a.gd) return b.gd - a.gd;
+        return b.gf - a.gf;
+      });
+      t.rows.forEach(function (r, i) { r.rank = i + 1; });
+    });
 
     recompute();
   }
@@ -454,16 +476,30 @@
       return U.compCard(c, compStats(c.id));
     }).join('');
 
-    var seasons = STATE.tables.filter(function (t) { return t.comp === STATE.standingsComp; });
-    if (!seasons.length) {
-      var withTables = STATE.tables[0];
-      if (withTables) { STATE.standingsComp = withTables.comp; STATE.standingsSeason = withTables.season; }
-      seasons = STATE.tables.filter(function (t) { return t.comp === STATE.standingsComp; });
+    // Le sélecteur liste TOUS les classements disponibles (toutes compétitions
+    // et toutes saisons) : l'utilisateur peut consulter les tableaux complets
+    // aussi bien que les classements en cours.
+    var seasons = STATE.tables.slice().sort(function (a, b) {
+      if (a.comp !== b.comp) {
+        var ca = compOrder(a.comp), cb = compOrder(b.comp);
+        return ca !== cb ? ca - cb : String(a.comp).localeCompare(String(b.comp));
+      }
+      // saison en cours d'abord, puis la plus récente
+      return (b.live ? 1 : 0) - (a.live ? 1 : 0) || String(b.season).localeCompare(String(a.season));
+    });
+    if (seasons.length && !seasons.some(function (t) {
+      return t.comp === STATE.standingsComp && t.season === STATE.standingsSeason;
+    })) {
+      STATE.standingsComp = seasons[0].comp;
+      STATE.standingsSeason = seasons[0].season;
     }
-    U.el('standingsSelect').innerHTML = seasons.map(function (t, i) {
+    U.el('standingsSelect').innerHTML = seasons.map(function (t) {
+      var c = compById(t.comp);
+      var nom = (c ? c.name : t.comp) + ' · ' + t.season;
+      var tag = t.complete ? (t.historical ? ' · classement final' : ' · complet') : ' · partiel';
       return '<option value="' + U.esc(t.comp + '|' + t.season) + '"' +
-        (t.season === STATE.standingsSeason || (!STATE.standingsSeason && i === 0) ? ' selected' : '') + '>' +
-        U.esc(String(t.comp).toUpperCase() + ' · ' + t.season + (t.historical ? ' (terminée)' : ' (en cours)')) + '</option>';
+        (t.comp === STATE.standingsComp && t.season === STATE.standingsSeason ? ' selected' : '') + '>' +
+        U.esc(nom + (t.live ? ' (en cours' + tag + ')' : tag)) + '</option>';
     }).join('');
   }
 

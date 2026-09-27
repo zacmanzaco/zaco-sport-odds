@@ -8,7 +8,7 @@
     "start": "node server.mjs",
     "dev": "node server.mjs",
     "vendor": "node -e \"require('fs').copyFileSync('node_modules/chart.js/dist/chart.umd.js','public/vendor/chart.umd.js')\"",
-    "test": "node tests/smoke.mjs && node tests/charts.mjs"
+    "test": "node tests/data.mjs && node tests/smoke.mjs && node tests/charts.mjs"
   },
   "repository": {
     "type": "git",
