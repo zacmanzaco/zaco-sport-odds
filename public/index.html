@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZACO Sport Odds — Pronostics football, statistiques en direct & suivi de bankroll</title>
+<meta name="description" content="Pronostics football basés sur un consensus de 4 modèles (Elo, Dixon-Coles, forme, marché), statistiques réelles en direct, calendrier, matchs en direct, classements et gestion de bankroll.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ============================== EN-TÊTE ============================== -->
+<header class="app-bar">
+  <div class="app-bar__inner">
+    <a class="brand" href="#accueil" data-nav="accueil">
+      <span class="brand__crest">⚽</span>
+      <span class="brand__txt">
+        <span class="brand__name">ZACO SPORT ODDS</span>
+        <span class="brand__sub">Pronostics &amp; statistiques football</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Navigation principale">
+      <a class="nav__link is-active" href="#accueil" data-nav="accueil">Accueil</a>
+      <a class="nav__link" href="#direct" data-nav="direct">En direct</a>
+      <a class="nav__link" href="#pronostics" data-nav="pronostics">Pronostics</a>
+      <a class="nav__link" href="#calendrier" data-nav="calendrier">Calendrier</a>
+      <a class="nav__link" href="#competitions" data-nav="competitions">Compétitions</a>
+      <a class="nav__link" href="#statistiques" data-nav="statistiques">Statistiques</a>
+      <a class="nav__link" href="#bankroll" data-nav="bankroll">Bankroll</a>
+      <a class="nav__link" href="#historique" data-nav="historique">Historique</a>
+      <a class="nav__link" href="#coupe-du-monde" data-nav="coupe-du-monde">Coupe du monde</a>
+      <a class="nav__link" href="#donnees" data-nav="donnees">Sources</a>
+    </nav>
+
+    <div class="app-bar__actions">
+      <span class="pill-live" title="Matchs en direct"><span class="dot-live"></span><span id="liveCount">0</span> LIVE</span>
+      <button class="btn-icon" id="btnRefresh" title="Synchroniser les données en direct" aria-label="Synchroniser">⟳</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- =============================== ACCUEIL ============================ -->
+  <section class="view is-visible" id="accueil">
+    <div class="hero">
+      <div class="hero__grid">
+        <div>
+          <span class="hero__badge">🟢 Données réelles · OpenLigaDB &amp; TheSportsDB</span>
+          <h1>Les pronostics football <em>pilotés par les données</em>, pas par l'intuition.</h1>
+          <p>
+            ZACO Sport Odds agrège quatre méthodes reconnues — <b>Elo</b>, <b>Poisson bivarié Dixon-Coles</b>,
+            <b>forme récente</b> et <b>probabilités implicites du marché</b> — pour produire un consensus
+            chiffré sur chaque match. Statistiques en direct, calendrier complet, classements et gestion de
+            bankroll au même endroit.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#pronostics" data-nav="pronostics">🎯 Voir les pronostics du jour</a>
+            <a class="btn btn--ghost" href="#direct" data-nav="direct">📡 Matchs en direct</a>
+            <button class="btn btn--ghost" id="btnDemo">▶ Démo live</button>
+          </div>
+        </div>
+        <div class="hero__side" id="heroStats"><!-- injecté par app.js --></div>
+      </div>
+    </div>
+
+    <div class="source-strip">
+      <span class="src-chip" id="modeChip">📦 Snapshot embarqué</span>
+      <b>Sources :</b> OpenLigaDB (Bundesliga, API libre) · TheSportsDB (championnats mondiaux) · Wikipédia
+      <span id="lastSync" style="margin-left:auto"></span>
+    </div>
+
+    <div class="stat-tile" style="background:rgba(10,26,47,.6)">
+      <div class="stat-tile__k">Vue d'ensemble du jeu de données</div>
+      <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:10px">
+        <div><span style="font-size:22px;font-weight:900" id="statTotal">0</span> <span class="hint">matchs</span></div>
+        <div><span style="font-size:22px;font-weight:900" id="statComps">0</span> <span class="hint">compétitions</span></div>
+        <div><span style="font-size:22px;font-weight:900" id="statLive">0</span> <span class="hint">en direct</span></div>
+        <div><span style="font-size:22px;font-weight:900" id="statAcc">—</span> <span class="hint">réussite du modèle</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================== DIRECT ============================= -->
+  <section class="section" id="direct">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">📡</span> Matchs en direct &amp; imminents</div>
+        <div class="section__sub">Bulles temps réel : scores et statuts actualisés automatiquement</div>
+      </div>
+      <div class="section__aside">
+        <button class="btn btn--ghost btn--sm" id="btnDemo">▶ Démo live</button>
+        <button class="btn btn--ghost btn--sm" id="btnRefresh">⟳ Actualiser</button>
+      </div>
+    </div>
+    <div class="live-bubbles" id="liveBubbles"></div>
+    <div class="match-grid" id="liveGrid"></div>
+  </section>
+
+  <!-- ============================= PRONOSTICS =========================== -->
+  <section class="section" id="pronostics">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">🎯</span> Pronostics du jour — consensus ZACO</div>
+        <div class="section__sub">Classés par confiance : accord entre modèles × probabilité × volume de données</div>
+      </div>
+    </div>
+    <div class="pro-grid" id="proGrid"></div>
+  </section>
+
+  <!-- ============================= CALENDRIER =========================== -->
+  <section class="section" id="calendrier">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">📅</span> Calendrier des matchs</div>
+        <div class="section__sub">Toutes les compétitions suivies · <span id="calendarCount">0 match</span></div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="search"><input id="searchInput" type="search" placeholder="Rechercher une équipe, un stade…" aria-label="Rechercher"></div>
+      <div class="chips" id="compChips"></div>
+    </div>
+    <div class="filters">
+      <div class="chips">
+        <span class="chip is-active" data-filter-range="upcoming">À venir</span>
+        <span class="chip" data-filter-range="today">Aujourd'hui</span>
+        <span class="chip" data-filter-range="week">7 jours</span>
+        <span class="chip" data-filter-range="month">30 jours</span>
+        <span class="chip" data-filter-range="past">Terminés</span>
+        <span class="chip" data-filter-range="all">Tout</span>
+      </div>
+      <div class="chips">
+        <span class="chip is-active" data-filter-status="all">Tous statuts</span>
+        <span class="chip" data-filter-status="NS">À venir</span>
+        <span class="chip" data-filter-status="LIVE">En direct</span>
+        <span class="chip" data-filter-status="FT">Terminés</span>
+      </div>
+    </div>
+
+    <div id="calendarBody"></div>
+  </section>
+
+  <!-- ============================ COMPÉTITIONS ========================== -->
+  <section class="section" id="competitions">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">🏆</span> Compétitions &amp; classements</div>
+        <div class="section__sub">Cliquez sur une compétition pour afficher son classement</div>
+      </div>
+      <div class="section__aside">
+        <select id="standingsSelect" class="chip" style="padding:9px 14px" aria-label="Choisir une saison"></select>
+      </div>
+    </div>
+    <div class="comp-grid" style="margin-bottom:26px" id="compGrid"></div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title" id="standingsTitle">Classement</div></div>
+      <div class="card__body" id="standingsBody"></div>
+    </div>
+  </section>
+
+  <!-- ============================ STATISTIQUES ========================== -->
+  <section class="section" id="statistiques">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">📊</span> Statistiques &amp; validation du modèle</div>
+        <div class="section__sub">Toutes les séries sont calculées à partir des résultats réels collectés</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid" id="dataStats" style="margin-bottom:20px"></div>
+
+    <div class="bank-grid" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card__head"><div class="card__title">Buts marqués / encaissés — Bundesliga 2025/2026</div>
+          <span class="src-chip" style="margin-left:auto">28 clubs → 18 équipes</span></div>
+        <div class="card__body"><div class="chart-box tall"><canvas id="chartGoals"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><div class="card__title">Taux de réussite du modèle (matchs terminés)</div></div>
+        <div class="card__body"><div class="chart-box tall"><canvas id="chartAccuracy"></canvas></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card__head"><div class="card__title">Comparaison des championnats — moyennes de buts par match</div></div>
+      <div class="card__body"><div class="chart-box"><canvas id="chartLeagues"></canvas></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><div class="card__title">Validation du modèle sur matchs réellement joués</div>
+        <span class="src-chip synced" style="margin-left:auto">forces calculées sur la saison précédente</span></div>
+      <div class="card__body" id="validationBody"></div>
+    </div>
+  </section>
+
+  <!-- ============================== BANKROLL ============================ -->
+  <section class="section" id="bankroll">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">💰</span> Gestion de bankroll</div>
+        <div class="section__sub">Capital, mises, ROI, drawdown et mise conseillée (demi-Kelly)</div>
+      </div>
+      <div class="section__aside">
+        <button class="btn btn--ghost btn--sm" id="btnDemoHistory">Charger un historique d'exemple</button>
+        <button class="btn btn--danger btn--sm" id="btnResetBank">Tout effacer</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid" id="bankKpis"></div>
+
+    <div class="bank-grid" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card__head"><div class="card__title">Évolution de la bankroll</div></div>
+        <div class="card__body"><div class="chart-box"><canvas id="chartBankroll"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><div class="card__title">Répartition des paris</div></div>
+        <div class="card__body"><div class="chart-box"><canvas id="chartResults"></canvas></div></div>
+      </div>
+    </div>
+
+    <div class="bank-grid">
+      <div class="card">
+        <div class="card__head"><div class="card__title">Ajouter un pari</div>
+          <span class="src-chip" style="margin-left:auto">value détectée automatiquement</span></div>
+        <div class="card__body">
+          <form id="betForm">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="betMatch">Match</label>
+                <select id="betMatch"></select>
+              </div>
+              <div class="field full" id="betMatchLabel" style="display:none">
+                <label for="betCustom">Nom du match (saisie libre)</label>
+                <input id="betCustom" placeholder="ex. Real Madrid – Barcelone">
+              </div>
+              <div class="field"><label for="betMarket">Marché</label>
+                <select id="betMarket">
+                  <option>1X2</option><option>Double chance</option>
+                  <option>Plus/Moins de buts</option><option>Les deux marquent</option><option>Score exact</option>
+                </select>
+              </div>
+              <div class="field"><label for="betPick">Pronostic</label>
+                <select id="betPick"><option value="1">1 · Domicile</option><option value="X">X · Match nul</option><option value="2">2 · Extérieur</option></select>
+              </div>
+              <div class="field"><label for="betOdds">Cote jouée</label>
+                <input id="betOdds" type="number" step="0.01" min="1.01" value="1.90">
+              </div>
+              <div class="field"><label for="betStake">Mise (€)</label>
+                <input id="betStake" type="number" step="1" min="1" value="20">
+                <div class="hint" id="betStakeHint"></div>
+              </div>
+              <div class="field full" id="betAnalysis"></div>
+              <div class="field full">
+                <div class="hint">Retour potentiel : <b id="betReturn">—</b></div>
+                <button class="btn btn--primary" type="submit" style="margin-top:10px">➕ Enregistrer le pari</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card__head"><div class="card__title">Paris en cours</div></div>
+          <div class="card__body" id="pendingBets"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div class="card__head"><div class="card__title">Capital &amp; unité de mise</div></div>
+          <div class="card__body">
+            <form id="initialForm">
+              <div class="form-grid">
+                <div class="field"><label for="initialAmount">Bankroll de départ (€)</label>
+                  <input id="initialAmount" type="number" min="1" step="10" value="1000"></div>
+                <div class="field"><label>Unité de mise</label>
+                  <div class="slider-wrap">
+                    <input id="unitRange" type="range" min="0.5" max="10" step="0.5" value="2">
+                    <span class="stake-preview" id="unitValue">2 %</span>
+                  </div>
+                  <div class="risk-meter"></div>
+                  <div class="hint">Le demi-Kelly est appliqué par défaut : mise = 50 % de la fraction de Kelly, plafonnée à 5 % de la bankroll.</div>
+                </div>
+                <div class="field full"><button class="btn btn--ghost" type="submit">Mettre à jour le capital</button></div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__head"><div class="card__title">Profit / perte par compétition</div></div>
+          <div class="card__body"><div class="chart-box"><canvas id="chartPnlComp"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= HISTORIQUE =========================== -->
+  <section class="section" id="historique">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">📜</span> Historique des pronostics</div>
+        <div class="section__sub">Paris réglés, matchs gagnés et perdus, plus la validation du modèle sur résultats réels</div>
+      </div>
+      <div class="section__aside">
+        <div class="chips">
+          <span class="chip is-active" data-hist="all">Tout</span>
+          <span class="chip" data-hist="won">Gagnés</span>
+          <span class="chip" data-hist="lost">Perdus</span>
+          <span class="chip" data-hist="pending">En cours</span>
+        </div>
+      </div>
+    </div>
+    <div class="kpi-grid" id="histSummary" style="margin-bottom:20px"></div>
+    <div class="hist-grid" id="histGrid"></div>
+  </section>
+
+  <!-- ========================== COUPE DU MONDE ========================== -->
+  <section class="section" id="coupe-du-monde">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">🌍</span> Coupe du Monde FIFA 2026</div>
+        <div class="section__sub">Compétition internationale · données officielles de la finale</div>
+      </div>
+    </div>
+    <div id="wcBody"></div>
+  </section>
+
+  <!-- ============================== SOURCES ============================= -->
+  <section class="section" id="donnees">
+    <div class="section__head">
+      <div>
+        <div class="section__title"><span class="ico">🔗</span> Sources de données &amp; réglages</div>
+        <div class="section__sub">D'où viennent les chiffres, et comment ajuster la synchronisation</div>
+      </div>
+    </div>
+    <div id="sourcesBody"></div>
+  </section>
+
+  <!-- =============================== FOOTER ============================= -->
+  <footer class="footer">
+    <div><b>⚽ ZACO SPORT ODDS</b> — site de démonstration de pronostics football</div>
+    <div>Données : <b>OpenLigaDB</b> (API libre sans clé) · <b>TheSportsDB</b> (clé publique de test « 3 ») · <b>Wikipédia</b></div>
+    <div class="disclaimer">
+      ⚠️ <b>Jeu responsable.</b> Les probabilités affichées sont issues de modèles statistiques calculés localement
+      à partir de résultats publics ; elles ne constituent ni un conseil en investissement ni une garantie de gain.
+      Les paris sportifs comportent un risque de perte. Interdit aux mineurs. En cas de besoin, contactez un service
+      d'aide au jeu (en France : 09 74 75 13 13, joueurs-info-service.fr).
+    </div>
+  </footer>
+</main>
+
+<!-- =============================== MODALE =============================== -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="modal__bg" id="modalBg"></div>
+  <div class="modal__panel">
+    <button class="btn-icon modal__close" id="modalClose" aria-label="Fermer">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast-host" id="toastHost"></div>
+
+<!-- ============================== SCRIPTS =============================== -->
+<script src="vendor/chart.umd.js"></script>
+<script src="js/data/snapshot.js"></script>
+<script src="js/model.js"></script>
+<script src="js/api.js"></script>
+<script src="js/bankroll.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
