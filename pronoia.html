@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PronoIA — Pronostics sportifs gratuits</title>
+<style>
+  :root { color-scheme: light dark; --accent: #ff7000; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100dvh; }
+  header { background: #111; color: #fff; padding: 0.9rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+  header .logo { font-weight: 800; font-size: 1.15rem; }
+  header .logo span { color: var(--accent); }
+  header .keybtn { background: none; border: 1px solid #555; color: #ddd; border-radius: 0.5rem; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
+  header .keybtn.ok { border-color: var(--accent); color: var(--accent); }
+  main { max-width: 780px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  .hero { text-align: center; margin: 1.5rem 0 2rem; }
+  .hero h1 { margin: 0 0 0.5rem; font-size: 1.9rem; }
+  .hero p { margin: 0; color: #666; }
+  .card { background: #fff; border: 1px solid #e2e2e2; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+  form { display: grid; gap: 0.9rem; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  label { font-size: 0.85rem; font-weight: 600; color: #444; display: block; margin-bottom: 0.3rem; }
+  select, input, textarea { width: 100%; padding: 0.65rem 0.8rem; border: 1px solid #ccc; border-radius: 0.5rem; font-size: 1rem; background: #fff; color: inherit; }
+  textarea { resize: vertical; min-height: 60px; }
+  button.primary { padding: 0.75rem 1.2rem; border: 0; border-radius: 0.5rem; background: var(--accent); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+  button.primary:disabled { opacity: 0.5; cursor: wait; }
+  .error { margin-top: 1rem; padding: 0.8rem 1rem; border-radius: 0.5rem; background: #fdecea; color: #b3261e; display: none; }
+  .result { margin-top: 1.5rem; display: none; }
+  .result .head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+  .result .head h2 { margin: 0; font-size: 1.3rem; }
+  .badge { background: var(--accent); color: #fff; border-radius: 999px; padding: 0.3rem 0.9rem; font-weight: 700; font-size: 0.9rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+  .stat { background: #f7f7f7; border-radius: 0.6rem; padding: 0.75rem; text-align: center; }
+  .stat .value { font-size: 1.25rem; font-weight: 800; }
+  .stat .label { font-size: 0.78rem; color: #777; margin-top: 0.2rem; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 48px; align-items: center; gap: 0.6rem; margin-bottom: 0.45rem; font-size: 0.88rem; }
+  .bar-track { background: #eee; border-radius: 999px; height: 10px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.6s ease; }
+  .analysis { line-height: 1.55; margin: 0 0 1rem; }
+  .factors { margin: 0; padding-left: 1.2rem; line-height: 1.7; }
+  .disclaimer { margin-top: 1.25rem; font-size: 0.8rem; color: #777; border-top: 1px dashed #ddd; padding-top: 0.9rem; line-height: 1.5; }
+  footer { text-align: center; font-size: 0.8rem; color: #888; padding: 1rem; }
+  dialog { border: 1px solid #ccc; border-radius: 1rem; padding: 1.5rem; max-width: 420px; width: 90%; }
+  dialog::backdrop { background: rgba(0,0,0,0.5); }
+  dialog h3 { margin: 0 0 0.75rem; }
+  dialog .actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem; }
+  dialog .actions button { padding: 0.5rem 1rem; border: 0; border-radius: 0.5rem; cursor: pointer; }
+  dialog .save { background: var(--accent); color: #fff; font-weight: 700; }
+  dialog .cancel { background: #eee; }
+  dialog p { font-size: 0.85rem; color: #666; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #141414; color: #eee; }
+    .hero p { color: #999; }
+    .card { background: #1f1f1f; border-color: #333; box-shadow: none; }
+    label { color: #bbb; }
+    select, input, textarea { background: #141414; border-color: #444; color: #eee; }
+    .stat { background: #2a2a2a; }
+    .stat .label { color: #999; }
+    .bar-track { background: #333; }
+    .error { background: #3a1d1a; color: #ff8a80; }
+    .disclaimer { color: #999; border-color: #333; }
+    dialog { background: #1f1f1f; color: #eee; border-color: #444; }
+    dialog .cancel { background: #333; color: #eee; }
+    dialog p { color: #999; }
+  }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">⚡ Prono<span>IA</span></div>
+  <button class="keybtn" id="keyBtn" type="button">🔑 Clé API</button>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Pronostics sportifs gratuits</h1>
+    <p>Analyse générée par IA pour vos matchs — football, basket, tennis, rugby et plus.</p>
+  </section>
+
+  <div class="card">
+    <form id="form">
+      <div>
+        <label for="sport">Sport</label>
+        <select id="sport">
+          <option>Football</option>
+          <option>Basket-ball</option>
+          <option>Tennis</option>
+          <option>Rugby</option>
+          <option>Hockey sur glace</option>
+          <option>Handball</option>
+          <option>Volley-ball</option>
+          <option>Baseball</option>
+          <option>Football américain</option>
+        </select>
+      </div>
+      <div class="row">
+        <div>
+          <label for="homeTeam">Équipe / joueur à domicile</label>
+          <input id="homeTeam" type="text" placeholder="ex : Paris SG" required />
+        </div>
+        <div>
+          <label for="awayTeam">Équipe / joueur à l'extérieur</label>
+          <input id="awayTeam" type="text" placeholder="ex : Marseille" required />
+        </div>
+      </div>
+      <div>
+        <label for="context">Contexte (optionnel)</label>
+        <textarea id="context" placeholder="ex : match de Ligue des Champions, l'équipe locale a gagné ses 5 derniers matchs…"></textarea>
+      </div>
+      <button type="submit" class="primary" id="submitBtn">Générer le pronostic</button>
+    </form>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="card result" id="result">
+    <div class="head">
+      <h2 id="matchTitle"></h2>
+      <span class="badge" id="confidenceBadge"></span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="value" id="predictionValue"></div><div class="label">Pronostic</div></div>
+      <div class="stat"><div class="value" id="scoreValue"></div><div class="label">Score probable</div></div>
+      <div class="stat"><div class="value" id="totalValue"></div><div class="label">Total attendu</div></div>
+    </div>
+    <div class="bars">
+      <div class="bar-row"><span id="homeLabel"></span><div class="bar-track"><div class="bar-fill" id="homeBar"></div></div><span id="homePct"></span></div>
+      <div class="bar-row" id="drawRow"><span>Match nul</span><div class="bar-track"><div class="bar-fill" id="drawBar"></div></div><span id="drawPct"></span></div>
+      <div class="bar-row"><span id="awayLabel"></span><div class="bar-track"><div class="bar-fill" id="awayBar"></div></div><span id="awayPct"></span></div>
+    </div>
+    <p class="analysis" id="analysisText"></p>
+    <ul class="factors" id="factorsList"></ul>
+    <div class="disclaimer">
+      Pronostic généré par IA à partir des connaissances du modèle (sans données en temps réel), fourni gratuitement à titre
+      informatif et divertissant. Cela ne constitue pas un conseil financier. Les paris sportifs comportent des risques :
+      ne misez que ce que vous pouvez vous permettre de perdre. Joueurs, jouez avec modération — 18+.
+    </div>
+  </div>
+</main>
+
+<footer>PronoIA — 100 % gratuit, propulsé par Mistral Small · Fichier autonome, fonctionne hors ligne (hors appels API)</footer>
+
+<dialog id="keyDialog">
+  <h3>Clé API Mistral</h3>
+  <p>Le fichier appelle directement api.mistral.ai depuis votre navigateur : votre clé reste sur votre machine (stockée dans Firefox via localStorage) mais n'est plus protégée par un serveur. Utilisez une clé dédiée que vous pouvez révoquer. Obtenez-en une gratuitement sur <a href="https://console.mistral.ai" target="_blank" rel="noopener">console.mistral.ai</a>.</p>
+  <input type="password" id="keyInput" placeholder="Votre clé API (commence par…)" autocomplete="off" />
+  <div class="actions">
+    <button type="button" class="cancel" id="keyCancel">Annuler</button>
+    <button type="button" class="save" id="keySave">Enregistrer</button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  var MODEL = "mistral-small-latest";
+  var API_URL = "https://api.mistral.ai/v1/chat/completions";
+  var STORAGE_KEY = "pronoia_mistral_api_key";
+
+  var SYSTEM_PROMPT = [
+    "Tu es un analyste sportif professionnel.",
+    "Génère un pronostic pour le match indiqué, en t'appuyant sur tes connaissances des équipes.",
+    "Réponds UNIQUEMENT avec un objet JSON valide, sans aucun texte autour, au format exact :",
+    '{ "prediction": "nom de l\'équipe vainqueur, ou \'Match nul\' si le sport l\'admet",',
+    '  "score": "score final probable au format \'2-1\'",',
+    '  "confidence": nombre entier entre 0 et 100,',
+    '  "probabilities": { "home": nombre, "draw": nombre, "away": nombre },',
+    '  "total": "total de buts/points attendu, ex : \'Plus de 2,5 buts\'",',
+    '  "analysis": "analyse concise en 3 à 4 phrases",',
+    '  "keyFactors": ["facteur clé 1", "facteur clé 2", "facteur clé 3"] }',
+    "Les trois probabilités doivent sommer à 100. Mettre \"draw\" à 0 si le sport n'admet pas de match nul.",
+    "Si tu ne connais pas suffisamment une équipe, dis-le dans l'analyse et baisse la confiance."
+  ].join("\n");
+
+  function $(id) { return document.getElementById(id); }
+
+  function getKey() {
+    try { return localStorage.getItem(STORAGE_KEY) || ""; } catch (e) { return ""; }
+  }
+
+  function setKey(value) {
+    try {
+      if (value) { localStorage.setItem(STORAGE_KEY, value); } else { localStorage.removeItem(STORAGE_KEY); }
+    } catch (e) { /* localStorage indisponible (mode privé strict) : la clé ne sera pas mémorisée */ }
+  }
+
+  function refreshKeyButton() {
+    var btn = $("keyBtn");
+    if (getKey()) {
+      btn.textContent = "🔑 Clé API enregistrée";
+      btn.classList.add("ok");
+    } else {
+      btn.textContent = "🔑 Clé API";
+      btn.classList.remove("ok");
+    }
+  }
+
+  function setBar(prefix, label, value) {
+    $(prefix + "Label").textContent = label;
+    var pct = Math.max(0, Math.min(100, Number(value) || 0));
+    $(prefix + "Bar").style.width = pct + "%";
+    $(prefix + "Pct").textContent = Math.round(pct) + "%";
+  }
+
+  function parseJsonLoose(raw) {
+    var cleaned = String(raw).trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    return JSON.parse(cleaned);
+  }
+
+  var keyDialog = $("keyDialog");
+  $("keyBtn").addEventListener("click", function () {
+    $("keyInput").value = getKey();
+    keyDialog.showModal();
+  });
+  $("keyCancel").addEventListener("click", function () { keyDialog.close(); });
+  $("keySave").addEventListener("click", function () {
+    setKey($("keyInput").value.trim());
+    refreshKeyButton();
+    keyDialog.close();
+  });
+
+  $("form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var errorBox = $("error");
+    var resultCard = $("result");
+    var submitBtn = $("submitBtn");
+    errorBox.style.display = "none";
+    resultCard.style.display = "none";
+
+    var apiKey = getKey();
+    if (!apiKey) {
+      errorBox.textContent = "Aucune clé API enregistrée. Cliquez sur « 🔑 Clé API » en haut à droite.";
+      errorBox.style.display = "block";
+      keyDialog.showModal();
+      return;
+    }
+
+    var payload = {
+      sport: $("sport").value,
+      homeTeam: $("homeTeam").value.trim(),
+      awayTeam: $("awayTeam").value.trim(),
+      context: $("context").value.trim()
+    };
+
+    if (!payload.homeTeam || !payload.awayTeam) {
+      errorBox.textContent = "Renseignez les deux équipes.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Analyse en cours…";
+
+    var userMessage = "Sport : " + payload.sport +
+      "\nMatch : " + payload.homeTeam + " (domicile) contre " + payload.awayTeam + " (extérieur)" +
+      (payload.context ? "\nContexte : " + payload.context : "");
+
+    fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userMessage }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.4
+      })
+    })
+    .then(function (response) {
+      return response.json().then(function (data) {
+        if (!response.ok) {
+          var detail = data && data.message ? data.message : "Erreur " + response.status;
+          if (response.status === 401) detail = "Clé API invalide. Vérifiez votre clé (bouton 🔑 en haut à droite).";
+          if (response.status === 429) detail = "Limite de requêtes atteinte. Attendez un moment avant de réessayer.";
+          throw new Error(detail);
+        }
+        return data;
+      });
+    })
+    .then(function (data) {
+      var raw = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "";
+      var p = parseJsonLoose(raw);
+      var draw = Number(p.probabilities && p.probabilities.draw) || 0;
+
+      $("matchTitle").textContent = payload.homeTeam + " vs " + payload.awayTeam;
+      $("predictionValue").textContent = p.prediction || "—";
+      $("scoreValue").textContent = p.score || "—";
+      $("totalValue").textContent = p.total || "—";
+
+      var confidence = Math.max(0, Math.min(100, Number(p.confidence) || 0));
+      $("confidenceBadge").textContent = "Confiance " + Math.round(confidence) + "%";
+
+      $("drawRow").style.display = draw > 0 ? "" : "none";
+      setBar("home", payload.homeTeam, p.probabilities && p.probabilities.home);
+      setBar("draw", "Match nul", draw);
+      setBar("away", payload.awayTeam, p.probabilities && p.probabilities.away);
+
+      $("analysisText").textContent = p.analysis || "";
+      var list = $("factorsList");
+      list.innerHTML = "";
+      (p.keyFactors || []).forEach(function (factor) {
+        var li = document.createElement("li");
+        li.textContent = factor;
+        list.appendChild(li);
+      });
+
+      resultCard.style.display = "block";
+      resultCard.scrollIntoView({ behavior: "smooth" });
+    })
+    .catch(function (err) {
+      errorBox.textContent = err && err.message ? err.message : "Erreur réseau. Vérifiez votre connexion.";
+      errorBox.style.display = "block";
+    })
+    .finally(function () {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Générer le pronostic";
+    });
+  });
+
+  refreshKeyButton();
+})();
+</script>
+</body>
+</html>
